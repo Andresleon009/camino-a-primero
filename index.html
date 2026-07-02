@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Camino a Primero</title>
+
+  <style>
+    :root {
+      --fondo: #101633;
+      --violeta: #7c3cff;
+      --rosa: #ff4fd8;
+      --cian: #33d6ff;
+      --dorado: #ffd166;
+      --menta: #4ee6a8;
+      --blanco: #ffffff;
+      --suave: #f7f4ff;
+      --texto: #20223a;
+      --gris: #747893;
+      --borde: rgba(255, 255, 255, 0.18);
+      --sombra: 0 18px 45px rgba(10, 12, 35, 0.18);
+      --radio: 28px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--texto);
+      line-height: 1.5;
+      background:
+        radial-gradient(circle at top left, rgba(124, 60, 255, 0.42), transparent 34%),
+        radial-gradient(circle at top right, rgba(255, 79, 216, 0.24), transparent 32%),
+        linear-gradient(180deg, var(--fondo) 0%, #161d48 32%, var(--suave) 32%, var(--suave) 100%);
+      overflow-x: hidden;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .page {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 26px 0 44px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Decoración */
+    .decor {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .bubble {
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(1px);
+      opacity: 0.58;
+    }
+
+    .bubble.one {
+      width: 170px;
+      height: 170px;
+      background: rgba(51, 214, 255, 0.14);
+      top: 12%;
+      left: 5%;
+    }
+
+    .bubble.two {
+      width: 220px;
+      height: 220px;
+      background: rgba(255, 79, 216, 0.12);
+      top: 5%;
+      right: 7%;
+    }
+
+    .bubble.three {
+      width: 140px;
+      height: 140px;
+      background: rgba(255, 209, 102, 0.13);
+      bottom: 22%;
+      right: 12%;
+    }
+
+    .star {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: var(--dorado);
+      clip-path: polygon(50% 0%, 62% 35%, 100% 50%, 62% 65%, 50% 100%, 38% 65%, 0% 50%, 38% 35%);
+      box-shadow: 0 0 18px rgba(255, 209, 102, 0.8);
+      opacity: 0.8;
+    }
+
+    .star.s1 { top: 12%; left: 18%; }
+    .star.s2 { top: 22%; right: 18%; background: var(--cian); }
+    .star.s3 { top: 43%; left: 8%; background: var(--rosa); }
+    .star.s4 { bottom: 14%; left: 18%; background: var(--menta); }
+
+    /* Base */
+    .section {
+      margin-top: 24px;
+    }
+
+    .kicker {
+      display: inline-block;
+      margin-bottom: 6px;
+      color: var(--violeta);
+      font-size: 0.8rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3 {
+      letter-spacing: -0.6px;
+    }
+
+    h2 {
+      font-size: clamp(1.5rem, 3vw, 2.15rem);
+    }
+
+    .muted {
+      color: var(--gris);
+      font-weight: 650;
+    }
+
+    .small {
+      font-size: 0.92rem;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 13px 20px;
+      font-weight: 900;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-primary {
+      color: #3d2600;
+      background: var(--dorado);
+      box-shadow: 0 14px 28px rgba(255, 209, 102, 0.26);
+    }
+
+    .btn-neon {
+      color: var(--blanco);
+      background: linear-gradient(135deg, var(--violeta), var(--rosa));
+      box-shadow: 0 14px 30px rgba(124, 60, 255, 0.24);
+    }
+
+    .btn-soft {
+      color: var(--blanco);
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.26);
+    }
+
+    .btn-light {
+      color: var(--texto);
+      background: rgba(247, 244, 255, 0.95);
+      border: 1px solid rgba(124, 60, 255, 0.14);
+    }
+
+    .btn-small {
+      padding: 9px 13px;
+      font-size: 0.86rem;
+    }
+
+    /* Hero */
+    .hero {
+      min-height: 360px;
+      border-radius: 36px;
+      padding: 44px;
+      color: var(--blanco);
+      border: 1px solid var(--borde);
+      background:
+        radial-gradient(circle at 76% 18%, rgba(51, 214, 255, 0.34), transparent 28%),
+        radial-gradient(circle at 88% 78%, rgba(255, 209, 102, 0.16), transparent 28%),
+        linear-gradient(135deg, rgba(124, 60, 255, 0.96), rgba(255, 79, 216, 0.72));
+      box-shadow: 0 25px 60px rgba(8, 10, 30, 0.28);
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 24px;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      right: -90px;
+      top: -80px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .hero h1 {
+      font-size: clamp(2.7rem, 7vw, 5.1rem);
+      line-height: 0.95;
+      margin-bottom: 18px;
+    }
+
+    .hero p {
+      max-width: 650px;
+      color: rgba(255, 255, 255, 0.92);
+    }
+
+    .hero-main-text {
+      font-size: clamp(1.22rem, 2.2vw, 1.55rem);
+      margin-bottom: 12px;
+      font-weight: 850;
+    }
+
+    .hello-text {
+      font-size: clamp(1.1rem, 2vw, 1.35rem);
+      font-weight: 850;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .audio-note {
+      margin-top: 14px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      width: fit-content;
+      max-width: 100%;
+      color: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.13);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    /* Foto de Sophie */
+    .sophie-stage {
+      min-height: 260px;
+      border-radius: 32px;
+      padding: 24px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      position: relative;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(8px);
+      overflow: hidden;
+    }
+
+    .sophie-stage::before {
+      content: "";
+      position: absolute;
+      width: 210px;
+      height: 80px;
+      border-radius: 50%;
+      bottom: 30px;
+      background: rgba(16, 22, 51, 0.22);
+    }
+
+    .photo-box {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      justify-items: center;
+      gap: 12px;
+    }
+
+    .photo-avatar {
+      width: 144px;
+      height: 144px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      color: var(--blanco);
+      background:
+        radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.9), transparent 20%),
+        linear-gradient(135deg, var(--dorado), var(--rosa), var(--cian));
+      box-shadow: 0 22px 44px rgba(6, 8, 28, 0.28);
+      border: 4px solid rgba(255, 255, 255, 0.34);
+    }
+
+    .photo-placeholder {
+      font-size: 4.4rem;
+      font-weight: 1000;
+    }
+
+    .photo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    .photo-img.show {
+      display: block;
+    }
+
+    .photo-placeholder.hide {
+      display: none;
+    }
+
+    .photo-label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      color: var(--blanco);
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      font-size: 0.88rem;
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform 0.18s ease;
+    }
+
+    .photo-label:hover {
+      transform: translateY(-2px);
+    }
+
+    .photo-input {
+      display: none;
+    }
+
+    .stage-name {
+      color: var(--blanco);
+      font-weight: 1000;
+    }
+
+    /* Zona de Sophie */
+    .sophie-zone {
+      margin-top: 24px;
+    }
+
+    .zone-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 18px;
+      margin-bottom: 16px;
+    }
+
+    .zone-header p {
+      max-width: 360px;
+    }
+
+    .activity-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .activity,
+    .words-card {
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(124, 60, 255, 0.12);
+      border-radius: var(--radio);
+      padding: 22px;
+      box-shadow: var(--sombra);
+    }
+
+    .activity-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .activity h3,
+    .words-card h3 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.28rem;
+    }
+
+    .icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: var(--blanco);
+      font-weight: 1000;
+      background: linear-gradient(135deg, var(--violeta), var(--rosa));
+    }
+
+    .big-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .letter-btn,
+    .syllable-btn,
+    .word-chip {
+      border: 1px solid rgba(124, 60, 255, 0.14);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .letter-btn:hover,
+    .syllable-btn:hover,
+    .word-chip:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 26px rgba(32, 34, 58, 0.12);
+      border-color: rgba(255, 79, 216, 0.28);
+    }
+
+    .letter-btn {
+      width: 72px;
+      height: 72px;
+      border-radius: 22px;
+      color: var(--violeta);
+      background:
+        radial-gradient(circle at 25% 20%, rgba(255, 255, 255, 0.9), transparent 24%),
+        linear-gradient(135deg, rgba(124, 60, 255, 0.14), rgba(255, 79, 216, 0.14));
+      font-size: 2rem;
+      font-weight: 1000;
+    }
+
+    .letter-btn.sound {
+      color: #087a97;
+      background: linear-gradient(135deg, rgba(51, 214, 255, 0.18), rgba(78, 230, 168, 0.18));
+    }
+
+    .syllable-lines {
+      display: grid;
+      gap: 10px;
+    }
+
+    .syllable-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .syllable-btn {
+      min-width: 54px;
+      padding: 10px 13px;
+      border-radius: 16px;
+      color: var(--texto);
+      background: rgba(247, 244, 255, 0.95);
+      font-weight: 1000;
+    }
+
+    .words-card {
+      margin-top: 18px;
+      color: var(--blanco);
+      background:
+        radial-gradient(circle at top right, rgba(255, 209, 102, 0.22), transparent 30%),
+        linear-gradient(135deg, var(--violeta), #281c63);
+    }
+
+    .words-card .muted {
+      color: rgba(255, 255, 255, 0.84);
+    }
+
+    .word-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .word-chip {
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: var(--blanco);
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.18);
+      font-weight: 900;
+    }
+
+    /* Adulto */
+    .adult-zone {
+      margin-top: 30px;
+    }
+
+    .adult-intro {
+      margin-bottom: 16px;
+    }
+
+    .accordion-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .accordion {
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(124, 60, 255, 0.12);
+      box-shadow: var(--sombra);
+      overflow: hidden;
+    }
+
+    .accordion-toggle {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      padding: 18px 20px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 14px;
+      text-align: left;
+      color: var(--texto);
+    }
+
+    .accordion-symbol {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      color: var(--blanco);
+      background: linear-gradient(135deg, var(--violeta), var(--rosa));
+      font-weight: 1000;
+    }
+
+    .accordion-toggle h3 {
+      font-size: 1.1rem;
+    }
+
+    .accordion-state {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      color: var(--gris);
+      background: rgba(123, 127, 152, 0.12);
+      font-size: 0.82rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .accordion.open .accordion-state {
+      color: #087a4f;
+      background: rgba(78, 230, 168, 0.18);
+    }
+
+    .chevron {
+      display: inline-block;
+      transition: transform 0.22s ease;
+    }
+
+    .accordion.open .chevron {
+      transform: rotate(180deg);
+    }
+
+    .accordion-body {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.25s ease;
+    }
+
+    .accordion.open .accordion-body {
+      grid-template-rows: 1fr;
+    }
+
+    .accordion-inner {
+      overflow: hidden;
+    }
+
+    .accordion-content {
+      padding: 0 20px 20px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .info-item {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(247, 244, 255, 0.85);
+      border: 1px solid rgba(124, 60, 255, 0.1);
+    }
+
+    .info-item span {
+      display: block;
+      color: var(--gris);
+      font-size: 0.84rem;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+
+    .info-item strong {
+      display: block;
+      font-size: 0.98rem;
+    }
+
+    .note {
+      margin-top: 14px;
+      padding: 13px;
+      border-radius: 18px;
+      color: #604500;
+      background: rgba(255, 209, 102, 0.18);
+      border: 1px solid rgba(255, 209, 102, 0.32);
+      font-weight: 800;
+    }
+
+    .diagnostic-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .check-item {
+      width: 100%;
+      border: 1px solid rgba(124, 60, 255, 0.13);
+      border-radius: 18px;
+      padding: 12px;
+      background: rgba(247, 244, 255, 0.74);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      text-align: left;
+      color: var(--texto);
+      transition: transform 0.18s ease, background 0.18s ease;
+    }
+
+    .check-item:hover {
+      transform: translateY(-1px);
+      background: var(--blanco);
+    }
+
+    .check-item strong {
+      font-size: 0.95rem;
+    }
+
+    .status {
+      min-width: 98px;
+      text-align: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 1000;
+    }
+
+    .status.pendiente {
+      color: #626780;
+      background: rgba(123, 127, 152, 0.14);
+    }
+
+    .status.observado {
+      color: #087a97;
+      background: rgba(51, 214, 255, 0.16);
+    }
+
+    .status.logrado {
+      color: #087a4f;
+      background: rgba(78, 230, 168, 0.18);
+    }
+
+    .levels {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .level-card {
+      min-height: 154px;
+      border: 1px solid rgba(124, 60, 255, 0.12);
+      border-radius: 22px;
+      padding: 16px;
+      background: var(--blanco);
+      text-align: left;
+      color: var(--texto);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .level-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 26px rgba(32, 34, 58, 0.12);
+    }
+
+    .level-card.active {
+      background: linear-gradient(135deg, #ffffff, #fff5fd);
+      border-color: rgba(255, 79, 216, 0.26);
+    }
+
+    .level-card.locked {
+      opacity: 0.68;
+      background: linear-gradient(135deg, #ffffff, #f1f0f8);
+    }
+
+    .level-number {
+      width: 38px;
+      height: 38px;
+      margin-bottom: 10px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: var(--blanco);
+      background: linear-gradient(135deg, var(--violeta), var(--rosa));
+      font-weight: 1000;
+    }
+
+    .locked .level-number {
+      color: #4b5068;
+      background: linear-gradient(135deg, #a9acc1, #d6d7e3);
+    }
+
+    .level-card h4 {
+      margin-bottom: 6px;
+      font-size: 0.98rem;
+    }
+
+    .level-card p {
+      color: var(--gris);
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .pill {
+      display: inline-flex;
+      width: fit-content;
+      margin-top: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 1000;
+    }
+
+    .pill.available {
+      color: #087a4f;
+      background: rgba(78, 230, 168, 0.18);
+    }
+
+    .pill.locked {
+      color: #626780;
+      background: rgba(123, 127, 152, 0.14);
+    }
+
+    .level-detail {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(247, 244, 255, 0.88);
+      border: 1px solid rgba(124, 60, 255, 0.12);
+      font-weight: 750;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 13px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      color: var(--gris);
+      font-size: 0.86rem;
+      font-weight: 900;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid rgba(124, 60, 255, 0.16);
+      border-radius: 17px;
+      padding: 12px 13px;
+      color: var(--texto);
+      background: rgba(247, 244, 255, 0.76);
+      outline: none;
+      transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    textarea {
+      min-height: 84px;
+      resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: rgba(124, 60, 255, 0.5);
+      background: var(--blanco);
+      box-shadow: 0 0 0 4px rgba(124, 60, 255, 0.1);
+    }
+
+    .form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 14px;
+    }
+
+    .storage-note {
+      margin: 0 0 14px;
+      padding: 12px;
+      border-radius: 17px;
+      color: #604500;
+      background: rgba(255, 209, 102, 0.18);
+      border: 1px solid rgba(255, 209, 102, 0.32);
+      font-weight: 850;
+    }
+
+    .history {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .history-card {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(247, 244, 255, 0.82);
+      border: 1px solid rgba(124, 60, 255, 0.1);
+    }
+
+    .history-card h4 {
+      margin-bottom: 8px;
+      color: var(--violeta);
+    }
+
+    .history-card p {
+      margin: 4px 0;
+      color: var(--texto);
+      font-size: 0.92rem;
+    }
+
+    .history-empty {
+      color: var(--gris);
+      font-weight: 700;
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(123, 127, 152, 0.08);
+    }
+
+    .recommendations {
+      display: grid;
+      gap: 11px;
+    }
+
+    .recommendation {
+      display: flex;
+      gap: 11px;
+      align-items: flex-start;
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(247, 244, 255, 0.8);
+      border: 1px solid rgba(124, 60, 255, 0.1);
+      font-weight: 750;
+    }
+
+    .dot {
+      flex: 0 0 28px;
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      color: #735000;
+      background: rgba(255, 209, 102, 0.28);
+      font-weight: 1000;
+    }
+
+    .closing {
+      margin-top: 26px;
+      padding: 30px;
+      border-radius: 34px;
+      text-align: center;
+      color: var(--blanco);
+      background:
+        radial-gradient(circle at 22% 25%, rgba(255, 209, 102, 0.22), transparent 24%),
+        linear-gradient(135deg, var(--fondo), #2b1d66);
+      box-shadow: var(--sombra);
+    }
+
+    .closing p {
+      max-width: 760px;
+      margin: 0 auto;
+      font-size: clamp(1.15rem, 3vw, 1.65rem);
+      font-weight: 1000;
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .activity-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .levels {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .hero {
+        padding: 38px;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .page {
+        width: min(100% - 22px, 1120px);
+        padding-top: 14px;
+      }
+
+      .hero {
+        padding: 28px;
+        min-height: auto;
+        border-radius: 28px;
+      }
+
+      .hero h1 {
+        letter-spacing: -1.4px;
+      }
+
+      .zone-header {
+        display: block;
+      }
+
+      .zone-header p {
+        margin-top: 7px;
+      }
+
+      .activity-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .letter-btn {
+        width: 62px;
+        height: 62px;
+        border-radius: 19px;
+        font-size: 1.7rem;
+      }
+
+      .photo-avatar {
+        width: 126px;
+        height: 126px;
+      }
+
+      .photo-placeholder {
+        font-size: 3.7rem;
+      }
+
+      .levels,
+      .info-grid,
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .accordion-toggle {
+        grid-template-columns: auto 1fr;
+      }
+
+      .accordion-state {
+        grid-column: 1 / -1;
+        width: fit-content;
+        margin-left: 56px;
+      }
+
+      .check-item {
+        grid-template-columns: 1fr;
+      }
+
+      .status {
+        width: fit-content;
+      }
+
+      .form-actions {
+        justify-content: stretch;
+      }
+
+      .form-actions .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="decor" aria-hidden="true">
+    <div class="bubble one"></div>
+    <div class="bubble two"></div>
+    <div class="bubble three"></div>
+    <div class="star s1"></div>
+    <div class="star s2"></div>
+    <div class="star s3"></div>
+    <div class="star s4"></div>
+  </div>
+
+  <div class="page">
+    <!-- Encabezado -->
+    <header class="hero">
+      <div>
+        <h1>Camino a Primero</h1>
+
+        <p class="hero-main-text">
+          Letras, sonidos y palabras.
+        </p>
+
+        <p class="hello-text">
+          Hola Sophie. ¿Comenzamos?
+        </p>
+
+        <div class="hero-actions">
+          <button class="btn btn-primary" type="button" id="goMission">
+            Comenzar
+          </button>
+
+          <button class="btn btn-soft speak-btn" type="button" data-speak="Hola Sofi. ¿Comenzamos?">
+            Escuchar
+          </button>
+        </div>
+
+        <div class="audio-note" id="audioStatus">
+          Toca para escuchar.
+        </div>
+      </div>
+
+      <div class="sophie-stage" aria-label="Foto de Sophie">
+        <div class="photo-box">
+          <div class="photo-avatar" id="photoAvatar">
+            <span class="photo-placeholder" id="photoPlaceholder">S</span>
+            <img class="photo-img" id="sophiePhoto" alt="Foto de Sophie" />
+          </div>
+
+          <label class="photo-label" for="photoInput">
+            Cargar foto
+          </label>
+
+          <input class="photo-input" id="photoInput" type="file" accept="image/*" />
+
+          <span class="stage-name">Sophie</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Zona de Sophie -->
+      <section class="section sophie-zone" id="mission">
+        <div class="zone-header">
+          <div>
+            <span class="kicker">Zona de Sophie</span>
+            <h2>Misión de hoy</h2>
+          </div>
+
+          <p class="muted">
+            Toca para escuchar.
+          </p>
+        </div>
+
+        <div class="activity-grid">
+          <article class="activity">
+            <div class="activity-head">
+              <h3><span class="icon">1</span> Vocales</h3>
+
+              <button class="btn btn-light btn-small speak-btn" type="button" data-speak="Toca para escuchar.">
+                Escuchar
+              </button>
+            </div>
+
+            <div class="big-buttons" aria-label="Vocales">
+              <button class="letter-btn speak-btn" type="button" data-speak="A">A</button>
+              <button class="letter-btn speak-btn" type="button" data-speak="E">E</button>
+              <button class="letter-btn speak-btn" type="button" data-speak="I">I</button>
+              <button class="letter-btn speak-btn" type="button" data-speak="O">O</button>
+              <button class="letter-btn speak-btn" type="button" data-speak="U">U</button>
+            </div>
+          </article>
+
+          <article class="activity">
+            <div class="activity-head">
+              <h3><span class="icon">2</span> Letras</h3>
+
+              <button class="btn btn-light btn-small speak-btn" type="button" data-speak="Toca para escuchar.">
+                Escuchar
+              </button>
+            </div>
+
+            <div class="big-buttons" aria-label="Letras">
+              <button class="letter-btn sound speak-btn" type="button" data-speak="M">M</button>
+              <button class="letter-btn sound speak-btn" type="button" data-speak="P">P</button>
+              <button class="letter-btn sound speak-btn" type="button" data-speak="S">S</button>
+              <button class="letter-btn sound speak-btn" type="button" data-speak="L">L</button>
+            </div>
+          </article>
+
+          <article class="activity">
+            <div class="activity-head">
+              <h3><span class="icon">3</span> Sílabas</h3>
+
+              <button class="btn btn-light btn-small speak-btn" type="button" data-speak="Toca para escuchar.">
+                Escuchar
+              </button>
+            </div>
+
+            <div class="syllable-lines" aria-label="Sílabas simples">
+              <div class="syllable-line">
+                <button class="syllable-btn speak-btn" type="button" data-speak="ma">ma</button>
+                <button class="syllable-btn speak-btn" type="button" data-speak="me">me</button>
+                <button class="syllable-btn speak-btn" type="button" data-speak="mi">mi</button>
+                <button class="syllable-btn speak-btn" type="button" data-speak="mo">mo</button>
+                <button class="syllable-btn speak-btn" type="button" data-speak="mu">mu</button>
+              </div>
+
+              <div class="syllable-line">
+                <button class="syllable-btn speak-btn" type="button" data-speak="pa">pa</button>
+                <button class="syllable-btn speak-btn" type="button" data-speak="pe">pe</button>
+                <button class="syllable-btn speak-btn" type="button" data-speak="pi">pi</button>
+                <button class="syllable-btn speak-btn" type="button" data-speak="po">po</button>
+                <button class="syllable-btn speak-btn" type="button" data-speak="pu">pu</button>
+              </div>
+
+              <div class="syllable-line">
+                <button class="syllable-btn speak-btn" type="button" data-speak="sa">sa</button>
+                <button class="syllable-btn speak-btn" type="button" data-speak="se">se</button>
+                <button class="syllable-btn speak-btn" type="button" data-speak="si">si</button>
+                <button class="syllable-btn speak-btn" type="button" data-speak="so">so</button>
+                <button class="syllable-btn speak-btn" type="button" data-speak="su">su</button>
+              </div>
+
+              <div class="syllable-line">
+                <button class="syllable-btn speak-btn" type="button" data-speak="la">la</button>
+                <button class="syllable-btn speak-btn" type="button" data-speak="le">le</button>
+                <button class="syllable-btn speak-btn" type="button" data-speak="li">li</button>
+                <button class="syllable-btn speak-btn" type="button" data-speak="lo">lo</button>
+                <button class="syllable-btn speak-btn" type="button" data-speak="lu">lu</button>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <article class="words-card">
+          <div class="activity-head">
+            <h3><span class="icon">4</span> Palabras</h3>
+
+            <button class="btn btn-soft btn-small speak-btn" type="button" data-speak="Toca para escuchar.">
+              Escuchar
+            </button>
+          </div>
+
+          <div class="word-list" aria-label="Palabras simples">
+            <button class="word-chip speak-btn" type="button" data-speak="mamá">mamá</button>
+            <button class="word-chip speak-btn" type="button" data-speak="papá">papá</button>
+            <button class="word-chip speak-btn" type="button" data-speak="mesa">mesa</button>
+            <button class="word-chip speak-btn" type="button" data-speak="sopa">sopa</button>
+            <button class="word-chip speak-btn" type="button" data-speak="luna">luna</button>
+            <button class="word-chip speak-btn" type="button" data-speak="pato">pato</button>
+            <button class="word-chip speak-btn" type="button" data-speak="sapo">sapo</button>
+            <button class="word-chip speak-btn" type="button" data-speak="sol">sol</button>
+          </div>
+        </article>
+      </section>
+
+      <!-- Adulto -->
+      <section class="section adult-zone">
+        <div class="adult-intro">
+          <span class="kicker">Adulto</span>
+          <h2>Adulto</h2>
+        </div>
+
+        <div class="accordion-list">
+          <!-- Perfil -->
+          <article class="accordion">
+            <button class="accordion-toggle" type="button" aria-expanded="false">
+              <span class="accordion-symbol">👧</span>
+              <span>
+                <h3>Perfil</h3>
+              </span>
+              <span class="accordion-state">
+                <span class="state-text">Cerrado</span>
+                <span class="chevron">⌄</span>
+              </span>
+            </button>
+
+            <div class="accordion-body">
+              <div class="accordion-inner">
+                <div class="accordion-content">
+                  <div class="info-grid">
+                    <div class="info-item">
+                      <span>Nombre</span>
+                      <strong>Sophie</strong>
+                    </div>
+
+                    <div class="info-item">
+                      <span>Edad</span>
+                      <strong>5 años</strong>
+                    </div>
+
+                    <div class="info-item">
+                      <span>Etapa</span>
+                      <strong>Preparación para 1°</strong>
+                    </div>
+
+                    <div class="info-item">
+                      <span>Intereses</span>
+                      <strong>Música, estrellas y heroínas pop</strong>
+                    </div>
+
+                    <div class="info-item">
+                      <span>Nivel inicial</span>
+                      <strong>Reconoce letras</strong>
+                    </div>
+
+                    <div class="info-item">
+                      <span>Estado</span>
+                      <strong>En observación</strong>
+                    </div>
+                  </div>
+
+                  <p class="note">
+                    Se completará después de observar la primera misión.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Diagnóstico -->
+          <article class="accordion">
+            <button class="accordion-toggle" type="button" aria-expanded="false">
+              <span class="accordion-symbol">✓</span>
+              <span>
+                <h3>Diagnóstico</h3>
+              </span>
+              <span class="accordion-state">
+                <span class="state-text">Cerrado</span>
+                <span class="chevron">⌄</span>
+              </span>
+            </button>
+
+            <div class="accordion-body">
+              <div class="accordion-inner">
+                <div class="accordion-content">
+                  <div class="diagnostic-list">
+                    <button class="check-item" type="button" data-state="pendiente">
+                      <strong>Reconoce vocales.</strong>
+                      <span class="status pendiente">Pendiente</span>
+                    </button>
+
+                    <button class="check-item" type="button" data-state="pendiente">
+                      <strong>Reconoce consonantes.</strong>
+                      <span class="status pendiente">Pendiente</span>
+                    </button>
+
+                    <button class="check-item" type="button" data-state="pendiente">
+                      <strong>Identifica sonidos de letras.</strong>
+                      <span class="status pendiente">Pendiente</span>
+                    </button>
+
+                    <button class="check-item" type="button" data-state="pendiente">
+                      <strong>Une consonante + vocal.</strong>
+                      <span class="status pendiente">Pendiente</span>
+                    </button>
+
+                    <button class="check-item" type="button" data-state="pendiente">
+                      <strong>Lee sílabas simples.</strong>
+                      <span class="status pendiente">Pendiente</span>
+                    </button>
+
+                    <button class="check-item" type="button" data-state="pendiente">
+                      <strong>Lee palabras cortas.</strong>
+                      <span class="status pendiente">Pendiente</span>
+                    </button>
+
+                    <button class="check-item" type="button" data-state="pendiente">
+                      <strong>Escribe su nombre.</strong>
+                      <span class="status pendiente">Pendiente</span>
+                    </button>
+
+                    <button class="check-item" type="button" data-state="pendiente">
+                      <strong>Copia palabras.</strong>
+                      <span class="status pendiente">Pendiente</span>
+                    </button>
+
+                    <button class="check-item" type="button" data-state="pendiente">
+                      <strong>Sigue instrucciones breves.</strong>
+                      <span class="status pendiente">Pendiente</span>
+                    </button>
+
+                    <button class="check-item" type="button" data-state="pendiente">
+                      <strong>Mantiene atención 5 a 7 minutos.</strong>
+                      <span class="status pendiente">Pendiente</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Registro -->
+          <article class="accordion">
+            <button class="accordion-toggle" type="button" aria-expanded="false">
+              <span class="accordion-symbol">✎</span>
+              <span>
+                <h3>Registro</h3>
+              </span>
+              <span class="accordion-state">
+                <span class="state-text">Cerrado</span>
+                <span class="chevron">⌄</span>
+              </span>
+            </button>
+
+            <div class="accordion-body">
+              <div class="accordion-inner">
+                <div class="accordion-content">
+                  <p class="storage-note">
+                    Se guarda solo en este navegador.
+                  </p>
+
+                  <div class="form-grid">
+                    <div class="field">
+                      <label for="fecha">Fecha de observación</label>
+                      <input id="fecha" type="date" />
+                    </div>
+
+                    <div class="field">
+                      <label for="favorita">Actividad favorita</label>
+                      <input id="favorita" type="text" placeholder="Ej.: vocales" />
+                    </div>
+
+                    <div class="field full">
+                      <label for="logro">¿Qué logró hoy?</label>
+                      <textarea id="logro" placeholder="Anota el logro principal."></textarea>
+                    </div>
+
+                    <div class="field full">
+                      <label for="costo">¿Qué le costó?</label>
+                      <textarea id="costo" placeholder="Anota qué necesita practicar más."></textarea>
+                    </div>
+
+                    <div class="field full">
+                      <label for="paso">Próximo paso</label>
+                      <textarea id="paso" placeholder="Ej.: practicar ma, me, mi."></textarea>
+                    </div>
+                  </div>
+
+                  <div class="form-actions">
+                    <button class="btn btn-neon" type="button" id="saveObservation">
+                      Guardar
+                    </button>
+
+                    <button class="btn btn-light" type="button" id="clearFields">
+                      Limpiar
+                    </button>
+
+                    <button class="btn btn-light" type="button" id="clearHistory">
+                      Borrar historial
+                    </button>
+                  </div>
+
+                  <div class="history" id="historyList"></div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Niveles -->
+          <article class="accordion">
+            <button class="accordion-toggle" type="button" aria-expanded="false">
+              <span class="accordion-symbol">★</span>
+              <span>
+                <h3>Niveles</h3>
+              </span>
+              <span class="accordion-state">
+                <span class="state-text">Cerrado</span>
+                <span class="chevron">⌄</span>
+              </span>
+            </button>
+
+            <div class="accordion-body">
+              <div class="accordion-inner">
+                <div class="accordion-content">
+                  <div class="levels">
+                    <button class="level-card active" type="button" data-title="Nivel 1: Estrella de Letras" data-detail="Disponible. Meta: reconocer letras y sonidos.">
+                      <div class="level-number">1</div>
+                      <h4>Estrella de Letras</h4>
+                      <p>Letras y sonidos.</p>
+                      <span class="pill available">Disponible</span>
+                    </button>
+
+                    <button class="level-card active" type="button" data-title="Nivel 2: Poder de Sonidos" data-detail="Disponible. Meta: unir sonidos con vocales.">
+                      <div class="level-number">2</div>
+                      <h4>Poder de Sonidos</h4>
+                      <p>Sonidos con vocales.</p>
+                      <span class="pill available">Disponible</span>
+                    </button>
+
+                    <button class="level-card locked" type="button" data-title="Nivel 3: Sílabas Pop" data-detail="Bloqueado por ahora. Meta: leer sílabas directas simples.">
+                      <div class="level-number">3</div>
+                      <h4>Sílabas Pop</h4>
+                      <p>Sílabas simples.</p>
+                      <span class="pill locked">Bloqueado</span>
+                    </button>
+
+                    <button class="level-card locked" type="button" data-title="Nivel 4: Palabras Brillantes" data-detail="Bloqueado por ahora. Meta: formar y leer palabras cortas.">
+                      <div class="level-number">4</div>
+                      <h4>Palabras Brillantes</h4>
+                      <p>Palabras cortas.</p>
+                      <span class="pill locked">Bloqueado</span>
+                    </button>
+
+                    <button class="level-card locked" type="button" data-title="Nivel 5: Frases con Ritmo" data-detail="Bloqueado por ahora. Meta: leer frases simples.">
+                      <div class="level-number">5</div>
+                      <h4>Frases con Ritmo</h4>
+                      <p>Frases simples.</p>
+                      <span class="pill locked">Bloqueado</span>
+                    </button>
+
+                    <button class="level-card locked" type="button" data-title="Nivel 6: Mini Cuentos" data-detail="Bloqueado por ahora. Meta: comprender historias cortas.">
+                      <div class="level-number">6</div>
+                      <h4>Mini Cuentos</h4>
+                      <p>Historias cortas.</p>
+                      <span class="pill locked">Bloqueado</span>
+                    </button>
+
+                    <button class="level-card locked" type="button" data-title="Nivel 7: Escritura Inicial" data-detail="Bloqueado por ahora. Meta: copiar, completar y escribir palabras.">
+                      <div class="level-number">7</div>
+                      <h4>Escritura Inicial</h4>
+                      <p>Copiar y escribir.</p>
+                      <span class="pill locked">Bloqueado</span>
+                    </button>
+
+                    <button class="level-card locked" type="button" data-title="Nivel 8: Lista para Primero" data-detail="Bloqueado por ahora. Meta: integrar lectura, atención, orden y hábitos escolares.">
+                      <div class="level-number">8</div>
+                      <h4>Lista para Primero</h4>
+                      <p>Hábitos escolares.</p>
+                      <span class="pill locked">Bloqueado</span>
+                    </button>
+                  </div>
+
+                  <div class="level-detail" id="levelDetail">
+                    Selecciona un nivel.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Casa -->
+          <article class="accordion">
+            <button class="accordion-toggle" type="button" aria-expanded="false">
+              <span class="accordion-symbol">⌂</span>
+              <span>
+                <h3>Casa</h3>
+              </span>
+              <span class="accordion-state">
+                <span class="state-text">Cerrado</span>
+                <span class="chevron">⌄</span>
+              </span>
+            </button>
+
+            <div class="accordion-body">
+              <div class="accordion-inner">
+                <div class="accordion-content">
+                  <div class="recommendations">
+                    <div class="recommendation">
+                      <span class="dot">1</span>
+                      <span>Practicar 10 minutos al día.</span>
+                    </div>
+
+                    <div class="recommendation">
+                      <span class="dot">2</span>
+                      <span>Usar juegos, no presión.</span>
+                    </div>
+
+                    <div class="recommendation">
+                      <span class="dot">3</span>
+                      <span>Celebrar pequeños logros.</span>
+                    </div>
+
+                    <div class="recommendation">
+                      <span class="dot">4</span>
+                      <span>Leer sílabas y palabras cortas.</span>
+                    </div>
+
+                    <div class="recommendation">
+                      <span class="dot">5</span>
+                      <span>Evitar gritos o burlas.</span>
+                    </div>
+
+                    <div class="recommendation">
+                      <span class="dot">6</span>
+                      <span>Crear un horario pequeño.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Cierre -->
+      <footer class="closing">
+        <p>
+          Cada letra es un paso.
+        </p>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    /* Navegación interna */
+    const goMission = document.getElementById("goMission");
+    const mission = document.getElementById("mission");
+
+    goMission.addEventListener("click", () => {
+      mission.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    /* Acordeones */
+    document.querySelectorAll(".accordion").forEach((accordion) => {
+      const toggle = accordion.querySelector(".accordion-toggle");
+      const stateText = accordion.querySelector(".state-text");
+
+      toggle.addEventListener("click", () => {
+        const isOpen = accordion.classList.toggle("open");
+        toggle.setAttribute("aria-expanded", String(isOpen));
+        stateText.textContent = isOpen ? "Abierto" : "Cerrado";
+      });
+    });
+
+    /* Checklist */
+    const stateOrder = ["pendiente", "observado", "logrado"];
+    const stateLabels = {
+      pendiente: "Pendiente",
+      observado: "Observado",
+      logrado: "Logrado"
+    };
+
+    document.querySelectorAll(".check-item").forEach((item) => {
+      item.addEventListener("click", () => {
+        const currentState = item.dataset.state;
+        const currentIndex = stateOrder.indexOf(currentState);
+        const nextState = stateOrder[(currentIndex + 1) % stateOrder.length];
+        const badge = item.querySelector(".status");
+
+        item.dataset.state = nextState;
+        badge.textContent = stateLabels[nextState];
+        badge.className = "status " + nextState;
+      });
+    });
+
+    /* Audio con SpeechSynthesis */
+    const audioStatus = document.getElementById("audioStatus");
+    const canSpeak = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+
+    audioStatus.textContent = "Toca para escuchar.";
+
+    function prepareSpeechText(text) {
+      return String(text || "")
+        .replaceAll("Sophie", "Sofi")
+        .replaceAll("sophie", "Sofi");
+    }
+
+    function speakText(text) {
+      const finalText = prepareSpeechText(text);
+
+      if (!canSpeak || !finalText) {
+        audioStatus.textContent = "Toca para escuchar.";
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(finalText);
+      utterance.lang = "es-ES";
+      utterance.rate = 0.82;
+      utterance.pitch = 1.08;
+      utterance.volume = 1;
+
+      utterance.onend = () => {
+        audioStatus.textContent = "Toca para escuchar.";
+      };
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    document.querySelectorAll(".speak-btn").forEach((button) => {
+      button.addEventListener("click", () => {
+        speakText(button.dataset.speak);
+      });
+    });
+
+    /* Foto de Sophie */
+    const photoKey = "caminoPrimeroFotoSophie";
+    const photoInput = document.getElementById("photoInput");
+    const sophiePhoto = document.getElementById("sophiePhoto");
+    const photoPlaceholder = document.getElementById("photoPlaceholder");
+
+    function showPhoto(src) {
+      if (!src) {
+        sophiePhoto.removeAttribute("src");
+        sophiePhoto.classList.remove("show");
+        photoPlaceholder.classList.remove("hide");
+        return;
+      }
+
+      sophiePhoto.src = src;
+      sophiePhoto.classList.add("show");
+      photoPlaceholder.classList.add("hide");
+    }
+
+    function loadSavedPhoto() {
+      try {
+        const savedPhoto = localStorage.getItem(photoKey);
+        showPhoto(savedPhoto);
+      } catch (error) {
+        showPhoto("");
+      }
+    }
+
+    photoInput.addEventListener("change", () => {
+      const file = photoInput.files && photoInput.files[0];
+
+      if (!file) return;
+
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const imageData = reader.result;
+
+        try {
+          localStorage.setItem(photoKey, imageData);
+        } catch (error) {
+          alert("La foto es muy grande para guardarse en este navegador.");
+        }
+
+        showPhoto(imageData);
+      };
+
+      reader.readAsDataURL(file);
+    });
+
+    loadSavedPhoto();
+
+    /* Detalle de niveles */
+    const levelDetail = document.getElementById("levelDetail");
+
+    document.querySelectorAll(".level-card").forEach((card) => {
+      card.addEventListener("click", () => {
+        const title = card.dataset.title;
+        const detail = card.dataset.detail;
+        levelDetail.innerHTML = "<strong>" + escapeHTML(title) + "</strong><br>" + escapeHTML(detail);
+      });
+    });
+
+    /* Registro con localStorage */
+    const storageKey = "caminoPrimeroObservacionesSofi";
+
+    const fecha = document.getElementById("fecha");
+    const logro = document.getElementById("logro");
+    const costo = document.getElementById("costo");
+    const favorita = document.getElementById("favorita");
+    const paso = document.getElementById("paso");
+
+    const saveObservation = document.getElementById("saveObservation");
+    const clearFields = document.getElementById("clearFields");
+    const clearHistory = document.getElementById("clearHistory");
+    const historyList = document.getElementById("historyList");
+
+    function escapeHTML(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function getObservations() {
+      try {
+        const saved = localStorage.getItem(storageKey);
+        return saved ? JSON.parse(saved) : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function setObservations(observations) {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(observations));
+      } catch (error) {
+        alert("No se pudo guardar en este navegador.");
+      }
+    }
+
+    function clearObservationFields() {
+      fecha.value = "";
+      logro.value = "";
+      costo.value = "";
+      favorita.value = "";
+      paso.value = "";
+    }
+
+    function renderHistory() {
+      const observations = getObservations();
+
+      if (!observations.length) {
+        historyList.innerHTML = '<div class="history-empty">Aún no hay observaciones guardadas.</div>';
+        return;
+      }
+
+      historyList.innerHTML = observations
+        .map((item, index) => {
+          return `
+            <article class="history-card">
+              <h4>Observación ${index + 1} · ${escapeHTML(item.fecha || "Sin fecha")}</h4>
+              <p><strong>Logro:</strong> ${escapeHTML(item.logro || "Sin registro")}</p>
+              <p><strong>Le costó:</strong> ${escapeHTML(item.costo || "Sin registro")}</p>
+              <p><strong>Actividad favorita:</strong> ${escapeHTML(item.favorita || "Sin registro")}</p>
+              <p><strong>Próximo paso:</strong> ${escapeHTML(item.paso || "Sin registro")}</p>
+            </article>
+          `;
+        })
+        .join("");
+    }
+
+    saveObservation.addEventListener("click", () => {
+      const observation = {
+        fecha: fecha.value.trim(),
+        logro: logro.value.trim(),
+        costo: costo.value.trim(),
+        favorita: favorita.value.trim(),
+        paso: paso.value.trim()
+      };
+
+      const hasContent = Object.values(observation).some((value) => value.length > 0);
+
+      if (!hasContent) {
+        alert("Primero escribe al menos un dato.");
+        return;
+      }
+
+      const observations = getObservations();
+      observations.unshift(observation);
+      setObservations(observations);
+      clearObservationFields();
+      renderHistory();
+    });
+
+    clearFields.addEventListener("click", () => {
+      clearObservationFields();
+    });
+
+    clearHistory.addEventListener("click", () => {
+      const ok = confirm("¿Borrar todo el historial guardado en este navegador?");
+      if (!ok) return;
+
+      try {
+        localStorage.removeItem(storageKey);
+      } catch (error) {
+        alert("No se pudo borrar el historial.");
+      }
+
+      renderHistory();
+    });
+
+    renderHistory();
+  </script>
+</body>
+</html>
